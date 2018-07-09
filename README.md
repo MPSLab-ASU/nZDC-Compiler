@@ -14,17 +14,21 @@ A) llvm-nZDC from here:
 	https://github.com/cmlasu/nZDC-Compiler/ 
 
 mkdir  ~/build
+
 cd ./build
+
 ../llvm/configure
+
 make -j2
 
 B) GCC cross-compiler for ARM V8
     sudo apt-get install gcc-aarch64-linux-gnu
 
 C) Install gem5 SE mode
-    http://www.gem5.org/Download
-    https://www.youtube.com/watch?v=SW63HJ0nW90
 
+    http://www.gem5.org/Download
+    
+    https://www.youtube.com/watch?v=SW63HJ0nW90
 
 # Compiling benchmarks
 
