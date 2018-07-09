@@ -13,7 +13,7 @@ There are several prerequisite software packages required to build and run LLVM 
 A) llvm-nZDC from here: 
 	https://github.com/cmlasu/nZDC-Compiler/ 
 
-mkdir  ~/build
+mkdir  ./build
 
 cd ./build
 
