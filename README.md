@@ -5,8 +5,8 @@ Prerequisites:
 There are several prerequisite software packages required to build and run LLVM compiler infrastructure and gem5 simulator. In this document we assume that all the required packages has been installed by the user and we focus on compiling benchmarks with nZDC soft error protection transformation and running them on gem5 simulator. We will be using three tools: 
 
 1) LLVM-nZDC compiler to compile a program 
-2) GCC cross-compiler  to generate static binary of the compiled programs
-3) Gem5 gcc-aarch64-linux-gnu to execute the binary
+2) GCC cross-compiler (gcc-aarch64-linux-gnu) to generate static binary of the compiled programs
+3) Gem5 to run programs
 
 ## Build and Install: 
 
