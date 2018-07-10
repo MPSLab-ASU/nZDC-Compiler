@@ -20,7 +20,7 @@ B) Building nZDC-llvm compiler
 ```
 cd ./LLVM3.7
 
-mv clang llvm/tools/
+mv -rf ./clang llvm/tools/
 
 mkdir  ./build
 
