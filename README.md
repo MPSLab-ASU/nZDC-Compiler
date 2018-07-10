@@ -2,7 +2,7 @@
 A LLVM-3.7 compiler with nZDC error detection transfromation.
 
 Prerequisites:
-There are several prerequisite software packages required to build and run LLVM compiler infrastructure and gem5 simulator. In this document we assume that all the required packages has been installed by the user and we focus on compiling benchmarks with nZDC soft error protection transformation and running them on gem5 simulator. We will be using three tools: 
+There are several prerequisite software packages required to build and run LLVM compiler infrastructure ([http://releases.llvm.org/3.7.1/docs/GettingStarted.html]) and gem5 simulator ([http://gem5.org/Compiling_M5]). In this document we assume that all the required packages has been installed by the user and we focus on compiling benchmarks with nZDC soft error protection transformation and running them on gem5 simulator. We will be using three tools: 
 
 1) LLVM-nZDC compiler to compile a program 
 2) GCC cross-compiler (gcc-aarch64-linux-gnu) to generate static binary of the compiled programs
@@ -12,8 +12,7 @@ There are several prerequisite software packages required to build and run LLVM 
 
 A) Download llvm-nZDC compiler from here:
 	[https://github.com/cmlasu/nZDC-Compiler/]
-	or by executing folowwing comand line from your terminal
-	
+	or by executing following comand from your terminal:
 ```
 git clone git@github.com:cmlasu/nZDC-Compiler.git
 ```
