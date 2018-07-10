@@ -64,6 +64,11 @@ gem5$: build/ARM/gem5.opt configs/example/se.py -c ./programs/mmopt-nZDC
 You can find the implementation of nZDC transfromation is the follwoing .cpp file:
 /LLVM3.7/llvm/lib/Target/AArch64/ZDC-R.cpp
 
+## Aditional Resources
+- [Soft error challenge] (http://aviral.lab.asu.edu/soft-error-resilience/)
+- [nZDC error detection paper](https://dl.acm.org/citation.cfm?id=2898054)
+- [Multithreaded nZDC] (https://ieeexplore.ieee.org/document/8289351/)
+
 ## Contact Us
 
 For any questions or comments on nZDC-Compiler, please contact us at cmlasu@gmail.com
