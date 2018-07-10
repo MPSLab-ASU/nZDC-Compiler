@@ -10,9 +10,15 @@ There are several prerequisite software packages required to build and run LLVM 
 
 ## Build and Install: 
 
-A) llvm-nZDC from here: 
+A) Download llvm-nZDC compiler from here:
+
 	[https://github.com/cmlasu/nZDC-Compiler/]
+	
+	or by executing folowwing comand line from your terminal
+	```
 	git clone git@github.com:cmlasu/nZDC-Compiler.git
+	```
+	
 ```
 cd ./LLVM3.7
 
@@ -25,7 +31,8 @@ cd ./build
 make -j2
 ```
 
-NOTE: At this point, the build directory should contain a "bin" directory which contains llvm tools including **clang** and **llc**. 
+NOTE: At this point, the build directory should contain a "bin" directory which contains llvm tools including **clang** and **llc**.
+
 B) GCC cross-compiler for ARM V8
     sudo apt-get install gcc-aarch64-linux-gnu
 
