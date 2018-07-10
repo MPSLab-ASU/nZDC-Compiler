@@ -1,7 +1,7 @@
 # nZDC-Compiler
-A LLVM-3.7 compiler with nZDC error detection transfromation.
+nZDC is a compiler transformation for soft error detection. This repository contain a LLVM-based compiler with nZDC transfromation. 
 
-Prerequisites:
+## Prerequisites:
 There are several prerequisite software packages required to build and run LLVM compiler infrastructure ([http://releases.llvm.org/3.7.1/docs/GettingStarted.html]) and gem5 simulator ([http://gem5.org/Compiling_M5]). In this document we assume that all the required packages has been installed by the user and we focus on compiling benchmarks with nZDC soft error protection transformation and running them on gem5 simulator. We will be using three tools: 
 
 1) LLVM-nZDC compiler to compile a program 
