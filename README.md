@@ -11,14 +11,13 @@ There are several prerequisite software packages required to build and run LLVM 
 ## Build and Install: 
 
 A) Download llvm-nZDC compiler from here:
-
 	[https://github.com/cmlasu/nZDC-Compiler/]
-	
 	or by executing folowwing comand line from your terminal
-	```
-	git clone git@github.com:cmlasu/nZDC-Compiler.git
-	```
 	
+```
+git clone git@github.com:cmlasu/nZDC-Compiler.git
+```
+B) Building nZDC-llvm compiler
 ```
 cd ./LLVM3.7
 
@@ -33,10 +32,12 @@ make -j2
 
 NOTE: At this point, the build directory should contain a "bin" directory which contains llvm tools including **clang** and **llc**.
 
-B) GCC cross-compiler for ARM V8
-    sudo apt-get install gcc-aarch64-linux-gnu
+C) GCC cross-compiler for ARM V8
+```
+sudo apt-get install gcc-aarch64-linux-gnu
+```
 
-C) Install gem5 SE mode
+D) Install gem5 SE mode
 
     http://www.gem5.org/Download
     
@@ -50,8 +51,10 @@ C) Install gem5 SE mode
 
 ./LLVM3.7/build/bin/llc -O3 -reserveRegs=true -enable-nZDC=true -march=aarch64 ./programs/mm.ll  -o ./programs/mmopt-nZDC.s
 ```
+
 NOTE: At this point the assembely file (.s) should contain duplicated and checking instructions. Since nZDC an error detection scheme, you should add your recovery scheme. The recovery blocks are inserted and only contain one instruction which is "sub	 x25, x25, x25". The simpleset recovery strategy is to terminate the program. It can be done by simply replacing  "sub	 x25, x25, x25" by "bl exit" instructions.
-```
+
+
 ### Creating executable file from assembely file
 ```
 aarch64-linux-gnu-gcc -static -O3 ./programs/mmopt-nZDC.s -o ./programs/mmopt-nZDC
@@ -60,3 +63,7 @@ aarch64-linux-gnu-gcc -static -O3 ./programs/mmopt-nZDC.s -o ./programs/mmopt-nZ
 ```
 gem5$: build/ARM/gem5.opt configs/example/se.py -c ./programs/mmopt-nZDC
 ```
+## nZDC instruction duplication and soft error detection implementation
+
+You can find the implementation of nZDC transfromation is the follwoing .cpp file:
+/LLVM3.7/llvm/lib/Target/AArch64/ZDC-R.cpp
