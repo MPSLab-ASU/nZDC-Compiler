@@ -36,17 +36,20 @@ C) Install gem5 SE mode
     https://www.youtube.com/watch?v=SW63HJ0nW90
 
 ## Compiling benchmarks
+
+### Compiling C/C++ source codes by clang and generating nZDC-protected assembely file
 ```
 ./LLVM3.7/build/bin/clang -I /usr/arm-linux-gnueabi/include/  -O3 -static -emit-llvm -target armv8-none-eabi  -S  ./programs/mm.c -o ./programs/mm.ll
 
 ./LLVM3.7/build/bin/llc -O3 -reserveRegs=true -enable-nZDC=true -march=aarch64 ./programs/mm.ll  -o ./programs/mmopt-nZDC.s
 ```
 NOTE: At this point the assembely file (.s) should contain duplicated and checking instructions. Since nZDC an error detection scheme, you should add your recovery scheme. The recovery blocks are inserted and only contain one instruction which is "sub	 x25, x25, x25". The simpleset recovery strategy is to terminate the program. It can be done by simply replacing  "sub	 x25, x25, x25" by "bl exit" instructions.
-
+```
+### Creating executable file from assembely file
 ```
 aarch64-linux-gnu-gcc -static -O3 ./programs/mmopt-nZDC.s -o ./programs/mmopt-nZDC
-
-Running nZDC-protected binaries on Gem5 Simulator
-
+```
+### Running nZDC-protected executable on Gem5 Simulator
+```
 gem5$: build/ARM/gem5.opt configs/example/se.py -c ./programs/mmopt-nZDC
 ```
