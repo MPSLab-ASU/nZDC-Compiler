@@ -65,12 +65,12 @@ You can find the implementation of nZDC transfromation is the follwoing .cpp fil
 /LLVM3.7/llvm/lib/Target/AArch64/ZDC-R.cpp
 
 ## Aditional Resources
-- [Soft error challenge] (http://aviral.lab.asu.edu/soft-error-resilience/)
+- [Soft error challenge](http://aviral.lab.asu.edu/soft-error-resilience/)
 - [nZDC error detection paper](https://dl.acm.org/citation.cfm?id=2898054)
-- [Multithreaded nZDC] (https://ieeexplore.ieee.org/document/8289351/)
+- [Multithreaded nZDC](https://ieeexplore.ieee.org/document/8289351/)
 
 ## Contact Us
 
 For any questions or comments on nZDC-Compiler, please contact us at cmlasu@gmail.com
 
-CML's nZDC Webpage - [http://aviral.lab.asu.edu/nzdc/]
+CML's nZDC Webpage - http://aviral.lab.asu.edu/nzdc/
