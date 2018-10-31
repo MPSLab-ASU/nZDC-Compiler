@@ -1,32 +1,25 @@
 	.text
-	.file	"./mmopt.ll"
+	.file	"../programs/mm.ll"
 	.globl	multiply
 	.align	2
 	.type	multiply,@function
 multiply:                               // @multiply
 // BB#0:                                // %entry
-	sub	 x6, x0, xzr
-	sub	 x7, x1, xzr
-	sub	 x8, x2, xzr
-	sub	 x9, x3, xzr
-	sub	 x10, x4, xzr
-	sub	 x11, x5, xzr
-	sub	 x12, x19, xzr
-	sub	 x13, x20, xzr
-	sub	 x14, x23, xzr
-	sub	 x15, x24, xzr
-	sub	 x16, x28, xzr
-	sub	 x17, x29, xzr
 	sub	 x18, x30, xzr
-	sub	x21, sp, xzr
 	stp	x24, x23, [sp, #-32]!
-	ldp	x15, x14, [x21, #-32]!
+	ldp	x24, x23, [x21, #-32]!
+	sub	 x25, x23, x14
+	cbnz	x25, .LBB0_3
+	sub	 x25, x24, x15
+	cbnz	x25, .LBB0_3
 	sub	x25, sp, x21
 	cbnz	x25, .LBB0_3
 	mov	 x9, xzr
 	mov	 x3, xzr
 	stp	x20, x19, [sp, #16]
-	ldp	x20, x12, [x21, #16]
+	ldp	x20, x19, [x21, #16]
+	sub	 x25, x19, x12
+	cbnz	x25, .LBB0_3
 	sub	 x25, x20, x13
 	cbnz	x25, .LBB0_3
 	add	x8, x8, #8              // =8
@@ -43,6 +36,7 @@ multiply:                               // @multiply
 	add	x3, x3, #16             // =16
 	stur	wzr, [x4, #-8]
 	ldur	wzr, [x10, #-8]
+	cbnz	xzr, .LBB0_3
 	ldur	w12, [x11, #-12]
 	ldur	w19, [x5, #-12]
 	ldr	 w13, [x7]
@@ -87,6 +81,7 @@ multiply:                               // @multiply
 	add	 w19, w19, w20
 	stp	w19, wzr, [x4, #-8]
 	ldp	w19, wzr, [x10, #-8]
+	cbnz	xzr, .LBB0_3
 	sub	w25, w19, w12
 	cbnz	w25, .LBB0_3
 	ldur	w12, [x11, #-12]
@@ -129,6 +124,7 @@ multiply:                               // @multiply
 	ldr	w23, [x1, #52]
 	str	 wzr, [x4]
 	ldr	 wzr, [x10]
+	cbnz	xzr, .LBB0_3
 	mul	 w13, w14, w13
 	mul	 w20, w23, w20
 	add	 w12, w12, w13
@@ -181,6 +177,7 @@ multiply:                               // @multiply
 	add	 w19, w19, w20
 	stp	 w19, wzr, [x4]
 	ldp	 w19, wzr, [x10]
+	cbnz	xzr, .LBB0_3
 	sub	w25, w19, w12
 	cbnz	w25, .LBB0_3
 	ldur	w12, [x11, #-12]
@@ -223,7 +220,6 @@ multiply:                               // @multiply
 	ldr	w20, [x1, #60]
 	mul	 w11, w13, w11
 	mul	 w5, w20, w5
-	cmp	 w9, #64                // =64
 	cmp	 w3, #64                // =64
 	add	 w11, w12, w11
 	add	 w5, w19, w5
@@ -239,7 +235,7 @@ multiply:                               // @multiply
 	ldp	x24, x23, [sp], #32
 	ret
 .LBB0_3:
-	bl	exit
+	sub	 x25, x25, x25
 .Lfunc_end0:
 	.size	multiply, .Lfunc_end0-multiply
 
@@ -263,10 +259,19 @@ main:                                   // @main
 	sub	 x18, x30, xzr
 	sub	x21, sp, xzr
 	stp	x20, x19, [sp, #-32]!
-	ldp	x13, x12, [x21, #-32]!
+	ldp	x20, x19, [x21, #-32]!
+	sub	 x25, x19, x12
+	cbnz	x25, .LBB1_1
+	sub	 x25, x20, x13
+	cbnz	x25, .LBB1_1
 	sub	x25, sp, x21
 	cbnz	x25, .LBB1_1
 	stp	x29, x30, [sp, #16]
+	ldp	x29, x30, [x21, #16]
+	sub	 x25, x30, x18
+	cbnz	x25, .LBB1_1
+	sub	 x25, x29, x17
+	cbnz	x25, .LBB1_1
 	add	x17, x21, #16           // =16
 	add	x29, sp, #16            // =16
 	sub	x21, x21, #192          // =192
@@ -1327,7 +1332,7 @@ main:                                   // @main
 	ldp	x20, x19, [sp], #32
 	ret
 .LBB1_1:
-	bl	exit
+	sub	 x25, x25, x25
 .Lfunc_end1:
 	.size	main, .Lfunc_end1-main
 

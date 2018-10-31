@@ -48,7 +48,7 @@ namespace llvm {
 
 class masterRegisters {
 public:
-  int numMasterRegs;
+  int numMasterRegs = 14;
   int masterRegs[14] = {AArch64::X0,  AArch64::X1,  AArch64::X2,  AArch64::X3,
                         AArch64::X4,  AArch64::X5,  AArch64::X19, AArch64::X20,
                         AArch64::X23, AArch64::X24, AArch64::X28, AArch64::FP,
@@ -115,6 +115,13 @@ public:
   // runOnMachineFunction
   //**********************************************************************
 
+  bool isMasterReg(int reg) {
+    for (int i = 0; i < ZDCmasterRegs.numMasterRegs; i++)
+      if (ZDCmasterRegs.masterRegs[i] == reg ||
+          ZDCmasterRegs.masterRegsW[i] == reg)
+        return true;
+    return false;
+  }
   //
   int getTheSlave(unsigned Reg) {
     switch (Reg) {
@@ -396,7 +403,7 @@ public:
                                              E = MBB->instr_end();
            I != E; ++I) {
         if (!(I->isBranch()) && !(I->mayStore()) && !(I->isCall()) &&
-            !(I->getOpcode() == AArch64::RET)) {
+            !(I->getOpcode() == AArch64::RET) && !(I->isCompare())) {
           bool duplicatable = true;
           MachineInstr *slaveinst = MF.CloneMachineInstr(I);
           for (int opcount = 0; opcount < I->getNumOperands(); opcount++) {
@@ -424,8 +431,18 @@ public:
     DebugLoc DL3 = I->getDebugLoc();
     MachineInstr *copyInst = NULL;
     MachineBasicBlock::iterator t;
-    for (int i = 0; i < ZDCmasterRegs.numMasterRegs; i++) {
-      masterReg = ZDCmasterRegs.masterRegs[i];
+    if (MF.getName() == "main")
+      for (int i = 0; i < ZDCmasterRegs.numMasterRegs; i++) {
+        masterReg = ZDCmasterRegs.masterRegs[i];
+        slaveReg = getTheSlave(masterReg);
+        copyInst = BuildMI(MF, DL3, TII->get(AArch64::SUBXrs), slaveReg)
+                       .addReg(masterReg)
+                       .addReg(AArch64::XZR)
+                       .addImm(0);
+        t = MB->insert(I, copyInst);
+      }
+    else {
+      masterReg = ZDCmasterRegs.masterRegs[12];
       slaveReg = getTheSlave(masterReg);
       copyInst = BuildMI(MF, DL3, TII->get(AArch64::SUBXrs), slaveReg)
                      .addReg(masterReg)
@@ -621,11 +638,18 @@ public:
          ++MBB)
       for (MachineBasicBlock::instr_iterator I = MBB->instr_begin(),
                                              E = MBB->instr_end();
-           I != E; ++I)
+           I != E; ++I) {
+        if (I->isCall()) {
+          // errs() << MF.getName();
+          // I->dump();
+          errs() << I->getOperand(0).getType();
+          // errs() << "num operands: " << I->NumOperands;
+        }
         if (I->mayStore()) {
           /*insert checking load instruction*/
           MachineInstr *loadInst = MF.CloneMachineInstr(I);
-          for (int opcount = 1; opcount < I->getNumOperands(); opcount++) {
+          for (int opcount = I->NumOperands - 2; opcount < I->getNumOperands();
+               opcount++) {
             if (I->getOperand(opcount).isReg()) {
               loadInst->getOperand(opcount).setReg(
                   getTheSlave(I->getOperand(opcount).getReg()));
@@ -637,35 +661,47 @@ public:
           const MCInstrDesc &MCID =
               TII->get(covertSTopcodeToLoad(I->getOpcode()));
           loadInst->setDesc(MCID);
-          if (loadInst->getOpcode() != I->getOpcode()){
-		   MachineBasicBlock::iterator loadPos = MBB->insertAfter(I++, loadInst);
+          if (loadInst->getOpcode() != I->getOpcode()) {
+            MachineBasicBlock::iterator loadPos = MBB->insertAfter(I, loadInst);
 
-          /*insert error detection checks*/
-		  int opnum=0;
-		  while (loadInst->getOperand(opnum).isReg() == false)
-		       opnum++;
-          int masterReg = loadInst->getOperand(opnum).getReg();
-          int slaveReg = getTheSlave(masterReg);
-          DebugLoc DL3 = MBB->findDebugLoc(I);
+            for (int opnum = 0; opnum < loadInst->getNumOperands(); opnum++) {
+              if (loadInst->getOperand(opnum).isReg()) {
+                int masterReg = loadInst->getOperand(opnum).getReg();
+                int slaveReg = getTheSlave(masterReg);
+                if (isMasterReg(masterReg) || masterReg == AArch64::XZR ||
+                    masterReg == AArch64::WZR) {
+                  DebugLoc DL3 = MBB->findDebugLoc(I);
 
-		  int destReg=AArch64::X25;
-		  if (is32Reg(masterReg))
-		  destReg=AArch64::W25;
-          MachineInstrBuilder copyInst =
-              BuildMI(MF, DL3, TII->get(AArch64::SUBXrs), destReg)
-                  .addReg(masterReg)
-                  .addReg(slaveReg)
-                  .addImm(0);
-		  if(masterReg != AArch64::WZR && masterReg != AArch64::XZR){
-          MachineBasicBlock::iterator cmpPOS =
-              MBB->insertAfter(loadPos, copyInst);
-          copyInst = BuildMI(MF, DL3, TII->get(AArch64::CBNZX), destReg)
-                         .addMBB(errorBB);
-          MachineBasicBlock::iterator brPOS =
-              MBB->insertAfter(cmpPOS, copyInst);
-		  }
-		  }
+                  int destReg = AArch64::X25;
+                  if (is32Reg(masterReg))
+                    destReg = AArch64::W25;
+                  MachineInstrBuilder copyInst =
+                      BuildMI(MF, DL3, TII->get(AArch64::SUBXrs), destReg)
+                          .addReg(masterReg)
+                          .addReg(slaveReg)
+                          .addImm(0);
+                  if (masterReg != AArch64::WZR && masterReg != AArch64::XZR) {
+                    MachineBasicBlock::iterator cmpPOS =
+                        MBB->insertAfter(loadPos, copyInst);
+                    copyInst =
+                        BuildMI(MF, DL3, TII->get(AArch64::CBNZX), destReg)
+                            .addMBB(errorBB);
+                    MachineBasicBlock::iterator brPOS =
+                        MBB->insertAfter(cmpPOS, copyInst);
+                  }
+                  if (masterReg == AArch64::WZR || masterReg == AArch64::XZR) {
+                    copyInst =
+                        BuildMI(MF, DL3, TII->get(AArch64::CBNZX), AArch64::XZR)
+                            .addMBB(errorBB);
+                    MachineBasicBlock::iterator brPOS =
+                        MBB->insertAfter(loadPos, copyInst);
+                  }
+                }
+              }
+            }
+          }
         }
+      }
   }
 
   char const *regs[228] = {
@@ -740,6 +776,14 @@ public:
 
     const char *FnName = "exit\0";
     recoveryBB->push_back(copyInst);
+
+    // MachineInstr *restart = BuildMI(MF,
+    // //(OrigBB->instr_begin())->getDebugLoc(),TII->get(AArch64::BL).addGlobalAddress(FnName);
+    // MachineInstr *restart = BuildMI(MF,
+    // (OrigBB->instr_begin())->getDebugLoc(),
+    //                                 TII->get(AArch64::BL))
+    //                             .addSym(FnName);
+
     return recoveryBB;
   }
   bool runOnMachineFunction(MachineFunction &MF) {
@@ -800,7 +844,7 @@ public:
       }
     }
   }
-int covertSTopcodeToLoad(int stOpcode) {
+  int covertSTopcodeToLoad(int stOpcode) {
 
     switch (stOpcode) {
     case AArch64::STRWui:

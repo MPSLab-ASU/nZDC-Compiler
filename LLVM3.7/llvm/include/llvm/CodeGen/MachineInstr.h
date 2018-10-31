@@ -67,13 +67,14 @@ public:
     BundledPred  = 1 << 1,              // Instruction has bundled predecessors.
     BundledSucc  = 1 << 2               // Instruction has bundled successors.
   };
+  unsigned NumOperands;                 // Number of operands on instruction.
 private:
   const MCInstrDesc *MCID;              // Instruction descriptor.
   MachineBasicBlock *Parent;            // Pointer to the owning basic block.
 
   // Operands are allocated by an ArrayRecycler.
   MachineOperand *Operands;             // Pointer to the first operand.
-  unsigned NumOperands;                 // Number of operands on instruction.
+
   typedef ArrayRecycler<MachineOperand>::Capacity OperandCapacity;
   OperandCapacity CapOperands;          // Capacity of the Operands array.
 
