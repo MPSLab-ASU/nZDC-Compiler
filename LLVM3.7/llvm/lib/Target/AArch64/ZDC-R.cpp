@@ -639,12 +639,6 @@ public:
       for (MachineBasicBlock::instr_iterator I = MBB->instr_begin(),
                                              E = MBB->instr_end();
            I != E; ++I) {
-        if (I->isCall()) {
-          // errs() << MF.getName();
-          // I->dump();
-          errs() << I->getOperand(0).getType();
-          // errs() << "num operands: " << I->NumOperands;
-        }
         if (I->mayStore()) {
           /*insert checking load instruction*/
           MachineInstr *loadInst = MF.CloneMachineInstr(I);
